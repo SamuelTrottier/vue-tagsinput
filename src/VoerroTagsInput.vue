@@ -460,7 +460,7 @@ export default {
     width: 100%;
     top: 50%;
     left: 0;
-    background: #5dc282;
+    background: #d14c43;
     
     height: 2px;
     margin-top: -1px;
