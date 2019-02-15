@@ -1,5 +1,5 @@
 {
-    "name": "@voerro/vue-tagsinput",
+    "name": "@samueltrottier/vue-tagsinput",
     "version": "1.11.1",
     "description": "A simple tags input with typeahead made with Vue.js 2",
     "main": "src/main.js",
