@@ -32,7 +32,7 @@
         </div>
 
         <!-- Typeahead/Autocomplete -->
-        <div v-show="searchResults.length">
+        <div v-show="searchResults.length || input">
             <p v-if="typeaheadStyle === 'badges'" :class="`typeahead-${typeaheadStyle}`">
                 <span v-for="(tag, index) in searchResults"
                     :key="index"
@@ -47,15 +47,24 @@
             </p>
 
             <ul v-else-if="typeaheadStyle === 'dropdown'" :class="`typeahead-${typeaheadStyle}`">
+                <li
+                    v-if="input"
+                    v-text="`${input} (${newTagText})`"
+                    @mouseover="searchSelection = -1"
+                    @mousedown.prevent="tagFromInput()"
+                    v-bind:class="{
+                        'tags-input-typeahead-item-default': -1 != searchSelection,
+                        'tags-input-typeahead-item-highlighted-default': -1  == searchSelection
+                    }"></li>
                 <li v-for="(tag, index) in searchResults"
-                :key="index"
-                v-text="tag.text"
-                @mouseover="searchSelection = index"
-                @mousedown.prevent="tagFromSearchOnClick(tag)"
-                v-bind:class="{
-                    'tags-input-typeahead-item-default': index != searchSelection,
-                    'tags-input-typeahead-item-highlighted-default': index == searchSelection
-                }"></li>
+                    :key="index"
+                    v-text="tag.text"
+                    @mouseover="searchSelection = index"
+                    @mousedown.prevent="tagFromSearchOnClick(tag)"
+                    v-bind:class="{
+                        'tags-input-typeahead-item-default': index != searchSelection,
+                        'tags-input-typeahead-item-highlighted-default': index == searchSelection
+                    }"></li>
             </ul>
         </div>
     </div>
@@ -67,7 +76,7 @@ export default {
         elementId: String,
 
         existingTags: {
-            type: Object,
+            type: Array,
             default: () => {
                 return {};
             }
@@ -105,6 +114,11 @@ export default {
             default: 'Add a tag'
         },
 
+        newTagText: {
+            type: String,
+            default: 'New Tag'
+        },
+
         limit: {
             type: Number,
             default: 0
@@ -124,7 +138,7 @@ export default {
             type: Boolean,
             default: false
         },
-        
+
         validate: {
             type: Function,
             default: () => true
@@ -152,7 +166,7 @@ export default {
             hiddenInput: '',
 
             searchResults: [],
-            searchSelection: 0,
+            searchSelection: -1,
         };
     },
 
@@ -255,7 +269,6 @@ export default {
 
             this.tags.splice(index, 1);
             this.tagBadges.splice(index, 1);
-
             // Emit events
             this.$emit('tag-removed', slug);
             this.$emit('tags-updated');
@@ -263,18 +276,20 @@ export default {
 
         searchTag() {
             if (this.typeahead === true) {
-                if (this.oldInput != this.input || (!this.searchResults.length && this.typeaheadActivationThreshold == 0)) {
+              console.log('1')
+                if ((this.oldInput != this.input && this.input) || !this.input || (!this.searchResults.length && this.typeaheadActivationThreshold == 0)) {
+              console.log('2')
                     this.searchResults = [];
-                    this.searchSelection = 0;
+                    if((this.oldInput != this.input)) {
+                      this.searchSelection = -1;
+                    }
                     let input = this.input.trim();
 
-                    if ((input.length && input.length >= this.typeaheadActivationThreshold) || this.typeaheadActivationThreshold == 0) {
+                    if ((input.length || input.length >= this.typeaheadActivationThreshold)) {
+              console.log('3')
                         for (let slug in this.existingTags) {
                             let text = this.existingTags[slug].toLowerCase();
-
-                            if (text.search(this.escapeRegExp(input.toLowerCase())) > -1 && ! this.tagSelected(slug)) {
-                                this.searchResults.push({ slug, text: this.existingTags[slug] });
-                            }
+                            this.searchResults.push({ slug, text: this.existingTags[slug] });
                         }
 
                         // Sort the search results alphabetically
@@ -318,7 +333,7 @@ export default {
         },
 
         prevSearchResult() {
-            if (this.searchSelection > 0) {
+            if (this.searchSelection > -1) {
                 this.searchSelection--;
             }
         },
@@ -461,7 +476,7 @@ export default {
     top: 50%;
     left: 0;
     background: #d14c43;
-    
+
     height: 2px;
     margin-top: -1px;
 }
