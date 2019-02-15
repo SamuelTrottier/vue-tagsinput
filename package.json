@@ -1,6 +1,6 @@
 {
     "name": "@samueltrottier/vue-tagsinput",
-    "version": "1.11.2",
+    "version": "1.11.3",
     "description": "A simple tags input with typeahead made with Vue.js 2",
     "main": "src/main.js",
     "keywords": [
