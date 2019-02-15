@@ -325,7 +325,7 @@ export default {
 
         ignoreSearchResults() {
             this.searchResults = [];
-            this.searchSelection = 0;
+            this.searchSelection = -1;
         },
 
         /**
